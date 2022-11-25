@@ -13,6 +13,7 @@ while getopts c:s:e:u:m:M:p:rw option ; do
       ;;
      u)
       user_reg=$OPTARG
+      echo $user_reg
       ;;
      m)
       min_PID=$OPTARG
@@ -44,4 +45,8 @@ done
 
 
 # THE SACRED LINE >> AWK IS OVERPOWERED
-filtered_pids=( $(ps -eo euser,pid,lstart | tail -n +2 | awk '{date=$3" "$4" "$5 "$6" "$7"; "date -d \"" date "\" " "\"+%s\"" | getline timestp; print $1,$2,timestp}' | awk '{"cat /proc/"$2"/comm" | getline proc_name; close(proc_name); regex="'$proc_reg'"; if ( (proc_name ~ regex) ){print $0} }' | grep -v -E "^cat:+" | grep -E $usr_reg | awk '{ if( $3 > $min_date && $3 < $max_date){ print $0 }}' | awk '{ if( $2 > $min_PID && $2 < $max_PID ){ print $2 }}') ) 
+# ps -eo euser,pid,lstart | tail -n +2 | awk '{date=$3" "$4" "$5 "$6" "$7"; "date -d \"" date "\" " "\"+%s\"" | getline timestp; print $1,$2,timestp}' | awk '{"cat /proc/"$2"/comm" | getline proc_name; close(proc_name); regex="'$proc_reg'"; if ( (proc_name ~ regex) ){print $0} }' | grep -v -E "^cat:+" | grep -E $usr_reg | awk '{ if( $3 > $min_date && $3 < $max_date){ print $0 }}' | awk '{ if( $2 > $min_PID && $2 < $max_PID ){ print $2 }}'
+ps -eo euser,pid,lstart | tail -n +2 \
+| awk '{date=$3" "$4" "$5 "$6" "$7"; "date -d \"" date "\" " "\"+%s\"" | getline timestp; print $1,$2,timestp}' \
+| awk '{"if [ -f /proc/122/comm ]; then cat /proc/122/comm ; fi" | getline proc_name; close(proc_name); regex="'$proc_reg'"; if ( (proc_name ~ regex) ){print $0} }' \
+| grep -E "$usr_reg"
