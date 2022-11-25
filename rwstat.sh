@@ -49,4 +49,4 @@ done
 ps -eo euser,pid,lstart | tail -n +2 \
 | awk '{date=$3" "$4" "$5 "$6" "$7"; "date -d \"" date "\" " "\"+%s\"" | getline timestp; print $1,$2,timestp}' \
 | awk '{"if [ -f /proc/122/comm ]; then cat /proc/122/comm ; fi" | getline proc_name; close(proc_name); regex="'$proc_reg'"; if ( (proc_name ~ regex) ){print $0} }' \
-| grep -E "$usr_reg"
+| awk '{regex="'$user_reg'"; if ( ($1 ~ regex) ){print $0} }' 
