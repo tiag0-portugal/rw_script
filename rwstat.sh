@@ -41,9 +41,9 @@ while getopts c:s:e:u:m:M:p:rw option ; do
 done
 
 
-# THE SACRED LINE >> AWK IS OVERPOWERED
+# THE HOLY LINE >> AWK IS OVERPOWERED
 ps -eo euser,pid,lstart | tail -n +2 \
-| awk '{date=$3" "$4" "$5 "$6" "$7"; "date -d \"" date "\" " "\"+%s\"" | getline timestp; print $1,$2,timestp}' \
+| awk '{date=$3" "$4" "$5" "$6" "$7; "date -d \"" date "\" " "\"+%s\"" | getline timestp; print $1,$2,timestp}' \
 | awk '{"if [ -f /proc/"$2"/comm ]; then cat /proc/"$2"/comm ; fi" | getline proc_name; close(proc_name); regex="'$proc_reg'"; if ( (proc_name ~ regex) ){print $0 } }' \
 | awk '{regex="'$user_reg'"; if ( ($1 ~ regex) ){print $0} }' \
 | awk '{ if( $3 > '$min_date' && $3 < '$max_date'){ print $0 }}' \
