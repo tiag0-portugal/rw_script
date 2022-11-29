@@ -35,8 +35,8 @@ data=( $(ps -eo euser,pid,lstart | tail -n +2 \
 | awk '$1 ~ "'$user_reg'" {print $0}' \
 | awk '{date=$3" "$4" "$5" "$6" "$7; "date -d \"" date "\" " "\"+%s\"" | getline timestp; if( timestp > '$min_date' && timestp < '$max_date'){ print $2,$1,timestp }}' \
 | awk '{ if( $1 > '$min_PID' && $1 < '$max_PID' ){ print $0 }}' \
-| awk '{"if [[ -r /proc/"$1"/io ]]; then cat /proc/"$1"/io | sed -n 5p | cut -d \" \" -f2; fi" | getline read; print $1,$2,$3,read}' \
-| awk '{"if [[ -r /proc/"$1"/io ]]; then cat /proc/"$1"/io | sed -n 6p | cut -d \" \" -f2; fi" | getline write; print $1":"$2":"$3":"$4":"write}') )
+| awk '{"if [[ -r /proc/"$1"/io ]]; then cat /proc/"$1"/io | sed -n 1p | cut -d \" \" -f2; fi" | getline read; print $1,$2,$3,read}' \
+| awk '{"if [[ -r /proc/"$1"/io ]]; then cat /proc/"$1"/io | sed -n 2p | cut -d \" \" -f2; fi" | getline write; print $1":"$2":"$3":"$4":"write}') )
 
 # data entry:
 # 636:tiago:1669662994:0:0
@@ -54,6 +54,8 @@ function out() {
     id=$( echo $entry | cut -d ":" -f1 )
     
     if [[ -r /proc/$id/io ]];then
+
+        i_rw=$( echo $entry | cut -d ":" -f4 )
         
         # Get date
 
@@ -70,12 +72,12 @@ function out() {
 
         # Calculate Readbytes
         i_rw=$( echo $entry | cut -d ":" -f4 )
-        f_rw=$( cat /proc/$id/io | sed -n 5p | cut -d " " -f2 )
+        f_rw=$( cat /proc/$id/io | sed -n 1p | cut -d " " -f2 )
         read=$(($f_rw-$i_rw))
 
         # Calculate Writebytes
         i_rw=$( echo $entry | cut -d ":" -f5 )
-        f_rw=$( cat /proc/$id/io | sed -n 6p | cut -d " " -f2 )
+        f_rw=$( cat /proc/$id/io | sed -n 2p | cut -d " " -f2 )
         write=$(($f_rw-$i_rw))
 
         # Calculate RateR
@@ -93,4 +95,12 @@ function out() {
 
 }
 
-out | sort $order_of_sort |sed -n "1,$p p"
+out  | sort $order_of_sort |sed -n "1,$p p"
+
+# Fixed ?
+
+# So i thougth the readbytes and wrotebytes by a process would be the 5th and 6th entries for having that exact name,
+# but the results were kinda of weird using those variables, so i searched if it really was the rigth place to search such data
+# when came up to this stack overflow [response](https://stackoverflow.com/a/3634088) and by reading it, i got even more confused,
+# but changed the data processing to grab data by the readchars and writechars and results were somewhat what i was expecting,
+# is it wrong, is it right, idk what i know is that even doing the calculations manually the latter implementation of this script made more sense 
