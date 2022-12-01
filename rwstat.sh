@@ -1,9 +1,25 @@
+n_arg=$#
 time=${@: -1}
+re='^[0-9]+$'
+
+
+if [ $n_arg -le 0 ]; then
+    echo "Parâmetro obrigatório em falta (Tempo em segundos )"
+    exit $E_ASSERT_FAILED
+fi
+ 
+ 
+if ! [[ $time =~ $re ]] ; then # se o argumento final não for um numero o programa não corre
+    echo "O ultimo argumento tem de ser o tempo"
+    exit $E_ASSERT_FAILED
+fi
+
+
 
 proc_reg="."
 user_reg="."
 min_date=-1
-max_date=$(($(date "+%s")+1000))
+max_date=$(($(date "+%s")+10000))
 min_PID=-1
 max_PID=$( cat /proc/sys/kernel/pid_max )
 order_of_sort="-k 4 -n"
@@ -15,11 +31,36 @@ while getopts c:s:e:u:m:M:p:wr option ; do
     case $option in
 
      c) proc_reg=$OPTARG;;
-     s) min_date=$(date -d "$OPTARG" "+%s");;
-     e) max_date=$(date -d "$OPTARG" "+%s");;
+     s) 
+      if [ $(date -d "$OPTARG" 2>: 1>:; echo $?) == 1 ]; then # 2>: limpar stderr, 1>: limpar stdout
+        echo "Data inicial invalida"
+        exit $E_ASSERT_FAILED
+      fi
+      min_date=$(date -d "$OPTARG" "+%s")
+      ;;
+     e) 
+      if [ $(date -d "$OPTARG" 2>: 1>:; echo $?) == 1 ]; then
+          echo "Data final invalida"
+          exit $E_ASSERT_FAILED
+      fi
+      max_date=$(date -d "$OPTARG" "+%s")
+      ;;
+     
      u) user_reg=$OPTARG;;
-     m) min_PID=$OPTARG;;
-     M) max_PID=$OPTARG;;
+     m) 
+      if ! [[ $OPTARG =~ $re ]] ; then # se o argumento final não for um numero o programa não corre
+        echo "PID minimo tem de ser um inteiro"
+        exit $E_ASSERT_FAILED
+      fi
+      min_PID=$OPTARG
+     ;;
+     M) 
+      if ! [[ $OPTARG =~ $re ]]; then # se o argumento final não for um numero o programa não corre
+        echo "PID maximo tem de ser um inteiro"
+        exit $E_ASSERT_FAILED
+      fi
+      max_PID=$OPTARG
+      ;;
      p) p=$OPTARG;;
      w) order_of_sort="-k 5 -n";;
      r) order_of_sort=$(echo $order_of_sort)" -r";;
@@ -27,7 +68,7 @@ while getopts c:s:e:u:m:M:p:wr option ; do
     esac
 done
 
-
+printf "%-10s\t%10s\t%10s\t%10s\t%10s\t%10s\t%10s\t%10s\n\n" "COMM" "USER" "PID" "READB" "WRITEB" "RATER" "RATEW" "DATE"
 
 # THE HOLY LINE >> AWK IS OVERPOWERED
 data=( $(ps -eo euser,pid,lstart | tail -n +2 \
@@ -38,16 +79,19 @@ data=( $(ps -eo euser,pid,lstart | tail -n +2 \
 | awk '{"if [[ -r /proc/"$1"/io ]]; then cat /proc/"$1"/io | sed -n 1p | cut -d \" \" -f2; fi" | getline read; print $1,$2,$3,read}' \
 | awk '{"if [[ -r /proc/"$1"/io ]]; then cat /proc/"$1"/io | sed -n 2p | cut -d \" \" -f2; fi" | getline write; print $1":"$2":"$3":"$4":"write}') )
 
-# data entry:
+# data entry: 
 # 636:tiago:1669662994:0:0
 # id:user:timespt:read:write
 
-printf "%-10s\t%10s\t%10s\t%10s\t%10s\t%10s\t%10s\t%10s\n\n" "COMM" "USER" "PID" "READB" "WRITEB" "RATER" "RATEW" "DATE"
+if [[ ${#data[@]} -eq 0 ]]; then
+  echo "No specified entries found"
+  exit 0
+fi
+
 
 sleep $time
 
-
-function out() {
+{
 
   for entry in ${data[@]}; do
 
@@ -93,9 +137,7 @@ function out() {
     fi
   done
 
-}
-
-out  | sort $order_of_sort |sed -n "1,$p p"
+} | sort $order_of_sort |sed -n "1,$p p"
 
 # Fixed ?
 

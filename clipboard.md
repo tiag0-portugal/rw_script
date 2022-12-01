@@ -27,16 +27,15 @@ lit       nlau    420      777     66666       21      200    Sep 19 08:49
 nbeast    idk     666     7777         6       12      300    Sep 19 08:49
 ```
 
-## Comandos para a formatação de informação
+## Estrutura Relátorio
 
-**RW de um processo N**
-
-```bash
-cat /proc/N/io | sed -n "5,6p" | awk '{print $2}'
-```
-
-**Array de elementos do tipo `ID DATE USER USERGROUP`**
-
-```bash
-
-```
+- Intro
+- Descrição da resolução
+    - Estruturas de dados
+    - organização
+    - fluxos
+    - testes
+- Conclusão
+- Bibliografia
+    - man pages
+    - urls
