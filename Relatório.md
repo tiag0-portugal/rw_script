@@ -238,11 +238,7 @@ data=( $(...) )
 
 Aqui simplesmente passamos a informação das operações executadas dentro do parêntesis para um array. Podemos a fluxo de informação ao longo desta linha através deste diagrama.
 
-
-
 <img src="data_flow.png" title="" alt="imagem" data-align="center">
-
-
 
 <u>Formação do output</u>
 
@@ -305,16 +301,58 @@ Para acedermos ao campo n de uma entrada do array podemos faze-lo
 var=$( echo $entry | cut -d ":" -fn )
 ```
 
+---
 
 
 
+### Testes
+
+Ao longo do desenvolvimento deste trabalho fizemos vários testes que podem se incluir numa das seguintes categorias:
+
+- **Teste das flags**
+  
+  Numa fase inicial começamos por testar uma a uma, após todas as flags implementadas corríamos o script com todas a flags e analisávamos o seu comportamento.
+  
+  **Ex:**
+  
+  ```bash
+  ./rwstat.sh -c "regex" -s "bottom_date" -e "upper_date" -u "user" -m minPID -M maxPID -p npro 10
+  ```
+
+- **Validação do output**
+  
+  Aqui simplesmente escolhíamos um processo especifico de controle com valores de escrita e leitura relevantes, como por exemplo o DE, para um determinado tempo e  paralelamente corríamos o treixo de código exemplificado e calculamos manualmente os valores, verificando se coincidiam relativamente com o output demonstrado.
+  
+  ```bash
+  cat /proc/PID/io; sleep $time; cat /proc/PID/io 
+  ```
+
+- **Validação dos "pipes"**
+  
+  Essencial para manter a integridade dos á medida que redirecionamos informação testa-vamos gradualmente se realmente obtiamos a saída pretendida.
 
 ---
 
-### Bibliografia
+### Conclusão
 
-[max_pid]([c - Maximum PID in Linux - Stack Overflow](https://stackoverflow.com/questions/6294133/maximum-pid-in-linux))
+Em suma o que retiramos deste trabalho é que a bash, além de uma shell, portanto um meio de comunicação com o sistema, é uma ferramenta versátil que pode fazer operações desde da edição de ficheiros á  atomização de fluxos de trabalho repetitivos.
 
-[ps man page]([ps(1): report snapshot of current processes - Linux man page](https://linux.die.net/man/1/ps))
+Ficamos também em geral com uma melhor precessão dos comportamentos de leitura e escrita, da sua relação com a directoria virtual  `/proc/` e como é atualizada á medida dos estado do mesmos.
+
+E por ultimo não podemos deixar de mencionar que descobrimos a verdadeira face de awk, que apesar de se apresentar como uma simples ferramenta de formatação de texto chega a níveis de versatilidade de uma linguagem de programação, podendo até ser considerada uma pseudó linguagem de programação.
+
+---
+
+### Bibliografia e links
+
+[Github](https://github.com/tiag0-portugal/rw_script.git)
+
+[Max PID](https://stackoverflow.com/questions/6294133/maximum-pid-in-linux)
+
+[ps man page]((https://linux.die.net/man/1/ps)
 
 [awk](https://www.gnu.org/software/gawk/manual/gawk.pdf)
+
+
+
+> **Trabalho realizado por Tiago nmec 103931 e Nuno nmec 107283**
