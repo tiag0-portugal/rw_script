@@ -6,7 +6,7 @@
 
 ### Introdução
 
-Neste trabalho temos como objétivo desenvolver um script que dará ao seu utilizador informação sobre a escrita e leitura dos vários processos ativos no sistema.
+Neste trabalho temos como objetivo desenvolver um script que dará ao seu utilizador informação sobre a escrita e leitura dos vários processos ativos no sistema.
 
 ```
 COMM     USER    PID    READB    WRITEB    RATER    RATEW           DATE
@@ -22,13 +22,13 @@ A utilização regular deste script pode ser realizada através do seguinte form
 ./rwstat.sh t
 ```
 
-sendo **t** um inteiro, que corresponde ao numero de segundos para o qual será analisado a escrita e leitura dos processos demonstrados na saída.
+sendo **t** um inteiro, que corresponde ao número de segundos para o qual será analisada a escrita e leitura dos processos demonstrados na saída.
 
 Também podemos filtrar a informação que nos é dada através de várias flags:
 
 #### -c /regex/
 
-    Com esta **flag** será nos entregue todos os processos cujo o nome encontrado em `/proc/pid/comm` corresponda/combine com o regex dado.
+    Com esta **flag** serão entregues todos os processos cujo nome encontrado em `/proc/pid/comm` corresponda/combine com o regex dado.
 
 **Ex:**
 
@@ -38,7 +38,7 @@ Também podemos filtrar a informação que nos é dada através de várias flags
 
 #### -s **start_date**  -e **ending_date**
 
-    Se quisermos obter todos os processos iniciados a partir de uma determinada data ou antes de uma outra, ou até mesmo num determinado intervalo de tempo podemos utilizar as flags acima, -s, para definir uma data de começo, -e, para definir uma data limite.
+    Se quisermos obter todos os processos iniciados a partir de uma determinada data ou antes de uma outra, ou até mesmo num determinado intervalo de tempo, podemos utilizar as flags acima, -s, para definir uma data de começo, -e, para definir uma data limite.
 
 **Ex:**
 
@@ -48,7 +48,7 @@ Também podemos filtrar a informação que nos é dada através de várias flags
 
 #### -u **/regex/**
 
-    Com esta **flag** será nos entregue todos os processos cujo o nome do utilizador corresponda/combine com o regex dado.
+    Com esta **flag** serão entregues todos os processos cujo nome do utilizador corresponda/combine com o regex dado.
 
 **Ex:**
 
@@ -58,7 +58,7 @@ Também podemos filtrar a informação que nos é dada através de várias flags
 
 #### -m **min_pid** -M **max_pid**
 
-    Estas opções dão nos a possibilidade de  obter todos os processos iniciados a partir de um pid ou antes de um outro, ou até mesmo todos os processos num determinado intervalo de pids utilizando as flags acima, -m, para definir um pid mínimo, -M, para definir um pid máximo.
+    Estas opções dão-nos a possibilidade de obter todos os processos iniciados a partir de um pid ou antes de um outro, ou até mesmo todos os processos num determinado intervalo de pids utilizando as flags acima, -m, para definir um pid mínimo, -M, para definir um pid máximo.
 
 **Ex:**
 
@@ -68,7 +68,7 @@ Também podemos filtrar a informação que nos é dada através de várias flags
 
 #### -p **n_proc**
 
- A flag -p define o numero de processos a ser mostrados na saída, em omissão o seu valor será 4. 
+ A flag -p define o número de processos a ser mostrados na saída. Em omissão o seu valor será 4. 
 
 **Ex:**
 
@@ -78,7 +78,7 @@ Também podemos filtrar a informação que nos é dada através de várias flags
 
 #### -r -w
 
- Sem a referencia destas flags os resultados são ordenados crescentemente pela ordem de leitura, no entanto podemos mudar esta ordem usar os dados de escrita com a flag -w, inverter a ordem com -r, ou ambas.
+ Sem a referência destas flags, os resultados são ordenados crescentemente pela ordem de leitura, no entanto podemos mudar esta ordem para usar os dados de escrita com a flag -w, inverter a ordem com -r, ou ambas.
 
 **Ex:**
 
@@ -92,17 +92,17 @@ Também podemos filtrar a informação que nos é dada através de várias flags
 
 **Organização**
 
-Para o desenvolvimento desta ferramenta começamos por testar como as opções eram recebidas e como fazer os asserts necessários, seguidamente trabalhamos em como recolher os dados e finalmente em aplicar as opções pelo que podemos dividir a resolução deste trabalho em 3 secções, <u>Sanitização de argumentos e opções</u>, <u>Recolha e processamento de dados</u>, <u>Aplicação das opções</u>.
+Para o desenvolvimento desta ferramenta, começamos por testar como as opções eram recebidas e como fazer os asserts necessários. Seguidamente, trabalhamos em como recolher os dados e finalmente em aplicar as opções, pelo que podemos dividir a resolução deste trabalho em 3 secções: <u>Sanitização de argumentos e opções</u>, <u>Recolha e processamento de dados</u>, <u>Aplicação das opções</u>.
 
-Apesar de conseguirmos ver relativamente estas secções no script não há qualquer compartimentação das mesmas, pelo que por exemplo parte da aplicação das opções está na recolha de dados para evitar o processamento de dados não pedido pelo utilizador.
+Apesar de conseguirmos ver relativamente bem estas secções no script, não há qualquer compartimentação das mesmas, pelo que por exemplo parte da aplicação das opções está na recolha de dados para evitar o processamento de dados não pedidos pelo utilizador.
 
 **Sanitização de argumentos e opções**
 
-Ao correr o script a primeira coisa que verificamos é o numero de argumentos e o argumento do tempo.
+Ao correr o script, a primeira coisa que verificamos é o numero de argumentos e o argumento do tempo.
 
-<u>Numero de argumentos</u>
+<u>Número de argumentos</u>
 
-Se o numero de argumentos for menor que 0 alertamos o utilizador que falta pelo menos o parâmetro obrigatório o tempo.
+Se o número de argumentos for menor que 0, alertamos o utilizador que falta pelo menos o parâmetro obrigatório do tempo.
 
 ```bash
 n_arg=$#
@@ -114,7 +114,7 @@ fi
 
 <u>Tempo</u>
 
-Ver e depois se é um inteiro, se um destes critérios não for seguidos imprimimos um alerta e paramos a execução.
+Ver depois se é um inteiro, se um destes critérios não for seguidos imprimimos um alerta e paramos a execução.
 
 ```bash
 n_arg=$#
@@ -136,11 +136,11 @@ fi
 ...
 ```
 
-Após a verificação inicial do argumento do tempo e do numero de argumentos, processamos todas as opções com o `getpops`, e verificamos, caso presentes, se as datas iniciais, finais ou ambas, são validas para passar como argumento para o comando `date` , que utilizamos para obter a unix timestamp da data, caso não seja alertarmos o utilizador.
+Após a verificação inicial do argumento do tempo e do número de argumentos, processamos todas as opções com o `getopts`, e verificamos, caso presentes, se as datas iniciais, finais ou ambas, são validas para passar como argumento para o comando `date` , que utilizamos para obter a unix timestamp da data. Caso não sejam, alertarmos o utilizador.
 
 <u>Datas</u>
 
-Para verificamos se realmente as datas são validas corremos o comando supondo que são, limpamos o **stderr**,`2>:`, e o **stdout**,`1>:`, e dando "`echo`" do código de saída. Caso seja um damos um alerta ao utilizador.
+Para verificarmos se realmente as datas são validas, corremos o comando supondo que são, limpamos o **stderr**,`2>:`, e o **stdout**,`1>:`, e damos "`echo`" do código de saída. Caso seja um damos um alerta ao utilizador.
 
 ```bash
 ...
@@ -154,11 +154,11 @@ s) ou e)
 ...
 ```
 
-Depois de validarmos as datas, se existirem, vamos verificar assim como no tempo, se o utilizador ativou as flags do **PID** mínimo,**PID** maximo ou ambas e confirmamos que são inteiros.
+Depois de validarmos as datas, se existirem, vamos verificar, assim como no tempo, se o utilizador ativou as flags do **PID** mínimo,**PID** maximo ou ambas e confirmamos que são inteiros.
 
 <u>Limites PID</u>
 
-Nada de especial simplesmente o que fizemos para o tempo.
+Nada de especial, simplesmente o que fizemos para o tempo.
 
 ```bash
  m) ou M)
@@ -172,7 +172,7 @@ Nada de especial simplesmente o que fizemos para o tempo.
 
 **Recolha e processamento de dados/Aplicação das opções**
 
-Aqui foi a parte onde, chegamos a conclusão, se já não era claro que **awk** é um poderoso processador de texto ao ponto, através de pipes e do mesmo conseguimos numa única linha obter todos os dados inicias necessário, algo ao qual chamei a **linha sagrada**.
+Foi aqui que chegamos à conclusão, se já não era claro, de que **awk** é um poderoso processador de texto, ao ponto de, através de pipes e do mesmo, conseguimos numa única linha obter todos os dados inicias necessários, algo ao que chamei de **linha sagrada**.
 
 ```bash
 data=( $(ps -eo euser,pid,lstart | tail -n +2 \
@@ -190,27 +190,27 @@ data=( $(ps -eo euser,pid,lstart | tail -n +2 \
 ps -eo euser,pid,lstart
 ```
 
-Aqui obtemos todas as colunas significativas para o nosso script que o `ps` nos pode dar o `user`,`pid` e `start_time`, podíamos também obter o nome do processo no entanto em alguns processos iria dar problemas devido a espaços aleatórios que impediam o `awk`de apanhar nome e sim apenas parte dele, sem mencionar que é nos estritamente indicado no guião para irmos buscar esta informação a `proc/pid/comm`.
+Aqui obtemos todas as colunas significativas para o nosso script que o `ps` nos pode dar: o `user`,`pid` e `start_time`, podíamos também obter o nome do processo, no entanto em alguns processos iriam ocorrer problemas devido a espaços aleatórios que impediam o `awk`de apanhar nome e sim apenas parte dele, sem mencionar que nos é estritamente indicado no guião para irmos buscar esta informação a `proc/pid/comm`.
 
 ```bash
 | awk '{"if [[ -f /proc/"2"/comm ]]; then cat /proc/"$2"/comm ; fi" | getline proc_name; close(proc_name); regex="'proc_reg'"; if ( (proc_name ~ regex) ){print $0 } }
 ```
 
-Dando pipe da instrução acima, utilizamos a **bash** dentro de **awk** para obtermos o nome do processo com o **PID** capturado no segundo campo, `$2`, de cada linha, verificamos se existe `if [[ -f ...`, e passarmos-o para o argumento de **awk** `proc_name` e ver se combina com o regex subtido pelo utilizador, ou por omissão `"."` que nos dá todas as entradas, `$proc_reg`, se sim imprimimos a linha toda.
+Dando pipe da instrução acima, utilizamos a **bash** dentro de **awk** para obtermos o nome do processo com o **PID** capturado no segundo campo, `$2`, de cada linha, verificamos se existe `if [[ -f ...`, e passamo-lo para o argumento de **awk** `proc_name`, vendo se combina com o regex submetido pelo utilizador, ou por omissão `"."`, que nos dá todas as entradas, `$proc_reg`, se sim imprimimos a linha toda.
 
 ```bash
 | awk '1 ~ "'$user_reg'" {print $0}'
 ```
 
-Agora, novamente recebendo pipe da linha acima, agora já com os processos desejados fazemos algo parecido com o nome do processo que retiramos, mas desta vez não necessitamos de usar bash pois conseguimos retirar o nome do utilizador para comparar logo a partir do primeiro campo, assim como no regex para os processos este é `"."` para caso o utilizador não especifique nenhum imprima todas as entradas.
+Agora, novamente recebendo pipe da linha acima, agora já com os processos desejados, fazemos algo parecido com o nome do processo que retiramos, mas desta vez não necessitamos de usar bash pois conseguimos retirar o nome do utilizador para comparar logo a partir do primeiro campo. Assim como no regex para os processos este é `"."` caso o utilizador não especifique nenhum, imprime todas as entradas.
 
 ```bash
 | awk '{date=$3" "$4" "$5" "$6" "$7; "date -d \"" date "\" " "\"+%s\"" | getline timestp; if( timestp > '$min_date' && timestp < '$max_date'){ print $2,$1,timestp }}'
 ```
 
-Para conseguirmos facilmente comparar os tempos dados pelo utilizador passamos utilizamos novamente **bash** para usar o comando `date` dentro de **awk** e fornecendo os campos necessários.
+Para conseguirmos facilmente comparar os tempos dados pelo utilizador, utilizamos novamente **bash** para usar o comando `date` dentro de **awk** e fornecendo os campos necessários.
 
-Obtendo as datas em unix time comparamos-as com as mínimas e máximas, já em **awk** , por omissão a data mínima é -1, não existem processos antes 1970, em principio, e a máxima é o tempo a que execução começou mais 2 horas, depois imprimindo o `pid`,`user`,`start_time` dos processos que cumprem a condição.
+Obtendo as datas em unix time comparamo-las com as mínimas e máximas, já em **awk** , por omissão a data mínima é -1, não existem processos antes 1970, em princípio, e a máxima é o tempo a que a execução começou mais 2 horas, depois imprimindo o `pid`,`user`,`start_time` dos processos que cumprem a condição.
 
 Esta é secção que demora mais a ser feita.
 
@@ -246,7 +246,8 @@ Aqui simplesmente passamos a informação das operações executadas dentro do p
 
 <u>Formação do output</u>
 
-Após a "linha sagrada" e a espera do tempo introduzido pelo utilizador,  não fazemos nada demais alem de recolher a informação do array descobrir o `read_atual` e `write_atual`  dos processos que ainda existem e calcular o  **read**,**write**, e os respectivos **rates**, tudo num ciclo numa agregação de código que dá pipe ao comando `sort` com opções definidas acima.
+Após a "linha sagrada" e a espera do tempo introduzido pelo utilizador, não fazemos nada demais senão recolher a informação do array, descobrir o `read_atual` e `write_atual` dos processos que ainda existem e calcular o  **read**,**write**, e os respectivos **rates**, tudo num ciclo numa agregação de código que dá pipe ao comando `sort` com opções definidas acima.
+Primeiramente, recorremos ao comando cut para selecionar as colunas do nosso elemento do array que queremos guardar em cada varíavel, definindo o separador como sendo ":". Para o id, vamos buscar a primeira coluna do array, para a data, a terceira coluna e para o user a segunda. A partir do id, vamos também buscar o nome do processo ao ficheiro "comm". Resta apenas calcular os readbytes, writebytes e a respetiva taxa de leitura e escrita. Para calcular os readbytes, vamos buscar os readbytes iniciais ao nosso array e os readbytes finais ao ficheiro io correspondente ao id que queremos, e subtraimos ao final o inicial. Para os writebytes, a lógica é a mesma mas damos cut à quinta coluna da entry. Para obter os rates, basta dividir os bytes lidos e escritos pelo tempo decorrido.
 
 ```bash
 {
