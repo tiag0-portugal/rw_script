@@ -32,14 +32,14 @@ while getopts c:s:e:u:m:M:p:wr option ; do
 
      c) proc_reg=$OPTARG;;
      s) 
-      if [ $(date -d "$OPTARG" 2>: 1>:; echo $?) == 1 ]; then # 2>: limpar stderr, 1>: limpar stdout
+      if [ $(date -d "$OPTARG" 2>/dev/null 1>/dev/null; echo $?) == 1 ]; then # 2>: limpar stderr, 1>: limpar stdout
         echo "Data inicial invalida"
         exit $E_ASSERT_FAILED
       fi
       min_date=$(date -d "$OPTARG" "+%s")
       ;;
      e) 
-      if [ $(date -d "$OPTARG" 2>: 1>:; echo $?) == 1 ]; then
+      if [ $(date -d "$OPTARG" 2>/dev/null 1>/dev/null; echo $?) == 1 ]; then
           echo "Data final invalida"
           exit $E_ASSERT_FAILED
       fi
@@ -89,7 +89,7 @@ if [[ ${#data[@]} -eq 0 ]]; then
 fi
 
 
-sleep $time
+sleep $(($time-3)) # 3s is ~ the execution time of the "sacred line"
 
 {
 
@@ -138,11 +138,3 @@ sleep $time
   done
 
 } | sort $order_of_sort |sed -n "1,$p p"
-
-# Fixed ?
-
-# So i thougth the readbytes and wrotebytes by a process would be the 5th and 6th entries for having that exact name,
-# but the results were kinda of weird using those variables, so i searched if it really was the rigth place to search such data
-# when came up to this stack overflow [response](https://stackoverflow.com/a/3634088) and by reading it, i got even more confused,
-# but changed the data processing to grab data by the readchars and writechars and results were somewhat what i was expecting,
-# is it wrong, is it right, idk what i know is that even doing the calculations manually the latter implementation of this script made more sense 
